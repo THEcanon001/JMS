@@ -6,6 +6,8 @@ import javax.jms.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Map;
 
 @Singleton
 @LocalBean
@@ -47,7 +49,9 @@ public class ApiServiceProducer {
     @POST
     @Path("recive")
     @Produces({MediaType.APPLICATION_JSON})
-    public Response test(String jsonScans){
+    @Consumes({MediaType.APPLICATION_JSON})
+//    public Response test(String jsonScans){
+    public Response test(List<Map<String, Object>> eventoList){
         try {
             //broadcast(jsonScans);
 
@@ -58,7 +62,7 @@ public class ApiServiceProducer {
             System.out.println("CANTIDAD: "+count);
             System.out.println("-------------------------------------");
             System.out.println("-------------------------------------");
-            return Response.status(200).entity(jsonScans).build();
+            return Response.status(200).entity("jsonScans").build();
         } catch (Exception e){
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getLocalizedMessage()).build();
