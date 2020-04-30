@@ -3,7 +3,7 @@ package datatype;
 import java.io.Serializable;
 import java.util.List;
 
-public class Punto implements Serializable {
+public class PuntoExterno implements Serializable {
     private String id;
     private Coord lugar;
     private double tiempoEspera;
@@ -13,10 +13,10 @@ public class Punto implements Serializable {
     private int horarioMax; //en segundos
     private int prioridad;
 
-    public Punto() {
+    public PuntoExterno() {
     }
 
-    public Punto(String id, Coord lugar, double tiempoEspera, List<String> vehiculos, double dimension, int horarioMin, int horarioMax, int prioridad) {
+    public PuntoExterno(String id, Coord lugar, double tiempoEspera, List<String> vehiculos, double dimension, int horarioMin, int horarioMax, int prioridad) {
         this.id = id;
         this.lugar = lugar;
         this.tiempoEspera = tiempoEspera;

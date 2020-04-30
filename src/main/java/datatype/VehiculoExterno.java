@@ -3,7 +3,7 @@ package datatype;
 import java.io.Serializable;
 import java.util.List;
 
-public class Vehiculo implements Serializable {
+public class VehiculoExterno implements Serializable {
     private String id;
     private Coord origen;
     private int horaSalida;
@@ -12,10 +12,10 @@ public class Vehiculo implements Serializable {
     private double capacidad;
     private List<String> puntosFijos;
 
-    public Vehiculo() {
+    public VehiculoExterno() {
     }
 
-    public Vehiculo(String id, Coord origen, int horaSalida, Coord destino, int horaLlegada, double capacidad, List<String> puntosFijos) {
+    public VehiculoExterno(String id, Coord origen, int horaSalida, Coord destino, int horaLlegada, double capacidad, List<String> puntosFijos) {
         this.id = id;
         this.origen = origen;
         this.horaSalida = horaSalida;

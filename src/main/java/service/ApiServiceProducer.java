@@ -1,6 +1,7 @@
 package service;
 
 import beans.GeneradorEJBBean;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
@@ -19,7 +20,12 @@ public class ApiServiceProducer {
     @GET
     @Path("generador")
     public String tutaGenerator(@QueryParam("puntos") int p, @QueryParam("vehiculos") int v){
-        generadorEJBBean.generarInstancia(p, v);
-        return "ALAAAAAA";
+        try {
+            generadorEJBBean.generarInstancia(p, v);
+            return "OK";
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return "ERROR, "+e.getMessage();
+        }
     }
 }

@@ -1,8 +1,13 @@
 package beans;
 
+import com.google.gson.Gson;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import datatype.Contenedor;
 import datatype.Coord;
-import datatype.Punto;
-import datatype.Vehiculo;
+import datatype.PuntoExterno;
+import datatype.VehiculoExterno;
 import utils.MersenneTwisterFast;
 import utils.R;
 
@@ -35,109 +40,120 @@ public class GeneradorEJBBean {
     private final static int minPrio = 10;
 
 
-    public void generarInstancia(int p, int v) {
-        if(p == 0 || v == 0){
-           p = generarCantPuntos();
-           v = generarCantVehiculos();
+    public void generarInstancia(int p, int v) throws UnirestException {
+        if (p == 0 || v == 0) {
+            p = generarCantPuntos();
+            v = generarCantVehiculos();
         }
-        List<Punto> puntos = generarListaPuntos(p);
-        List<Vehiculo> vehiculos = generarListaVehiculos(v);
-        enviar(puntos, vehiculos);
+        List<PuntoExterno> puntoExternos = generarListaPuntos(p);
+        List<VehiculoExterno> vehiculoExternos = generarListaVehiculos(v);
+        enviar(puntoExternos, vehiculoExternos);
     }
 
-    private void enviar(List<Punto> puntos, List<Vehiculo> vehiculos) {
-        System.out.println("PUNTOS ENVIADOS CON EXITO");
+    private void enviar(List<PuntoExterno> puntoExternos, List<VehiculoExterno> vehiculoExternos) throws UnirestException {
+        Contenedor contenedor = new Contenedor(puntoExternos, vehiculoExternos);
+        Unirest.setTimeouts(0, 0);
+        Gson gson = new Gson();
+        try {
+            Unirest.post("http://localhost:8080/ruteo-ws-26/rest/ruteows/ruta")
+                    .header("Content-Type", "application/json")
+                    .body(gson.toJson(contenedor))
+                    .asString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-    private List<Vehiculo> generarListaVehiculos(int cantV) {
-        List<Vehiculo> vehiculos = new ArrayList<>();
-        Vehiculo v;
-        for(int i = 0; i < cantV; i++){
-            v = new Vehiculo();
+    private List<VehiculoExterno> generarListaVehiculos(int cantV) {
+        List<VehiculoExterno> vehiculoExternos = new ArrayList<>();
+        VehiculoExterno v;
+        for (int i = 0; i < cantV; i++) {
+            v = new VehiculoExterno();
             v.setId("" + i);
             v.setOrigen(generarUbicacion());
             v.setDestino(generarUbicacion());
             v.setHoraSalida(generarHora());
             v.setHoraLlegada(generarHora());
-            while(v.getHoraSalida() > v.getHoraLlegada() || Math.abs(v.getHoraLlegada() - v.getHoraSalida()) < 120){
+            while (v.getHoraSalida() > v.getHoraLlegada() || Math.abs(v.getHoraLlegada() - v.getHoraSalida()) < 120) {
                 v.setHoraSalida(generarHora());
                 v.setHoraLlegada(generarHora());
             }
             v.setCapacidad(generarCapacidad());
             v.setPuntosFijos(generarPuntos());
-            vehiculos.add(v);
+            vehiculoExternos.add(v);
         }
-        return vehiculos;
+        return vehiculoExternos;
     }
 
-    private List<Punto> generarListaPuntos(int cantP) {
-        List<Punto> puntos = new ArrayList<>();
-        Punto p;
-        for(int i = 0; i < cantP; i++) {
-            p = new Punto();
-            p.setId(""+i);
+    private List<PuntoExterno> generarListaPuntos(int cantP) {
+        List<PuntoExterno> puntoExternos = new ArrayList<>();
+        PuntoExterno p;
+        for (int i = 0; i < cantP; i++) {
+            p = new PuntoExterno();
+            p.setId("" + i);
             p.setLugar(generarUbicacion());
             p.setTiempoEspera(generarTiempo());
             p.setVehiculos(generarVehiculos());
             p.setDimension(generarDimension());
             p.setHorarioMin(generarHora());
             p.setHorarioMax(generarHora());
-            while(p.getHorarioMin() > p.getHorarioMax() || Math.abs(p.getHorarioMax() - p.getHorarioMin()) < 30){
+            while (p.getHorarioMin() > p.getHorarioMax() || Math.abs(p.getHorarioMax() - p.getHorarioMin()) < 30) {
                 p.setHorarioMin(generarHora());
                 p.setHorarioMax(generarHora());
             }
             p.setPrioridad(generarPrioridad());
-            puntos.add(p);
+            puntoExternos.add(p);
         }
-       return puntos;
+        return puntoExternos;
     }
 
 
     private int generarCantVehiculos() {
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        return R.randomValueFromClosedInterval(1, maxV , rnd);
+        return R.randomValueFromClosedInterval(1, maxV, rnd);
     }
 
     private int generarCantPuntos() {
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        return R.randomValueFromClosedInterval(1, maxP , rnd);
+        return R.randomValueFromClosedInterval(1, maxP, rnd);
     }
 
     private int generarPrioridad() {
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        return R.randomValueFromClosedInterval(1, minPrio , rnd);
+        return R.randomValueFromClosedInterval(1, minPrio, rnd);
     }
 
     private int generarHora() {
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        return R.randomValueFromClosedInterval(HMIN, HMAX , rnd);
+        return R.randomValueFromClosedInterval(HMIN, HMAX, rnd);
     }
 
     private double generarCapacidad() {
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        return R.randomValueFromClosedInterval(DMINV, DMAXV , rnd);
+        return R.randomValueFromClosedInterval(DMINV, DMAXV, rnd);
     }
 
     private double generarDimension() {
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        return R.randomValueFromClosedInterval(DMINP, DMAXP , rnd);
+        return R.randomValueFromClosedInterval(DMINP, DMAXP, rnd);
     }
 
     private List<String> generarPuntos() {
         List<String> puntos = new ArrayList<>();
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        int random =  R.randomValueFromClosedInterval(0, maxP/10 , rnd);
+        int random = R.randomValueFromClosedInterval(0, maxP / 10, rnd);
         if (random > 0 && random < 20)
-            for(int i = 0 ; i < random; i++){
-                random = R.randomValueFromClosedInterval(1, maxP , rnd);
-                puntos.add(""+i);
+            for (int i = 0; i < random; i++) {
+                random = R.randomValueFromClosedInterval(1, maxP, rnd);
+                puntos.add("" + i);
             }
         return puntos;
     }
@@ -146,11 +162,11 @@ public class GeneradorEJBBean {
         List<String> vehiculos = new ArrayList<>();
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        int random =  R.randomValueFromClosedInterval(0, maxV , rnd);
+        int random = R.randomValueFromClosedInterval(0, maxV, rnd);
         if (random > 0)
-            for(int i = 0 ; i < random; i++){
-                random = R.randomValueFromClosedInterval(1, maxV , rnd);
-                vehiculos.add(""+i);
+            for (int i = 0; i < random; i++) {
+                random = R.randomValueFromClosedInterval(1, maxV, rnd);
+                vehiculos.add("" + i);
             }
         return vehiculos;
     }
@@ -158,13 +174,13 @@ public class GeneradorEJBBean {
     private double generarTiempo() {
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        return R.randomValueFromClosedInterval(tiempoMin, tiempoMax , rnd);
+        return R.randomValueFromClosedInterval(tiempoMin, tiempoMax, rnd);
     }
 
     private Coord generarUbicacion() {
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        int lat = R.randomValueFromClosedInterval(min, max , rnd);
+        int lat = R.randomValueFromClosedInterval(min, max, rnd);
 
         rnd = new MersenneTwisterFast((int) Math.floor(Math.random() * 200 + 1));
         int longitud = R.randomValueFromClosedInterval(min_2, max_2, rnd);
