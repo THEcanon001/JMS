@@ -9,7 +9,7 @@ public class Coord implements Serializable {
     public Coord() {
     }
 
-    public Coord(Double longitud, Double latitud) {
+    public Coord(Double latitud, Double longitud) {
         this.longitud = longitud;
         this.latitud = latitud;
     }
