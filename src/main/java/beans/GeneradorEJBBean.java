@@ -53,7 +53,7 @@ public class GeneradorEJBBean {
         puntoExternos = generarListaPuntos(p, v);
         List<VehiculoExterno> vehiculoExternos = generarListaVehiculos(v, p);
         imprimir(puntoExternos, vehiculoExternos);
-        //enviar(puntoExternos, vehiculoExternos);
+        enviar(puntoExternos, vehiculoExternos);
 
     }
 
