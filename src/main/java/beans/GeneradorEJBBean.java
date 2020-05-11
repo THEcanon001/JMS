@@ -78,7 +78,7 @@ public class GeneradorEJBBean {
             writer.write("Puntos: ");
             writer.newLine();
             for(PuntoExterno p :contenedor.getPuntos()){
-                int id = Integer.parseInt(p.getId())+1;
+                int id = Integer.parseInt(p.getId());
                 pto= "IDE: "+p.getId()+"\nID: "+id+"\nTiempo E:" + minutosHoras(p.getTiempoEspera())+ "\nHora Min:"+minutosHoras(p.getHorarioMin()) + "\nHora Max:" +minutosHoras(p.getHorarioMax()) +
                         "\nPrio:"+p.getPrioridad() + "\nCapacidad:" + p.getDimension() + "\nVehiculos permitidos:" + p.getVehiculos().toString()+"\n";
                 writer.write(pto);
@@ -87,7 +87,7 @@ public class GeneradorEJBBean {
             writer.write("Vehiculos: ");
             writer.newLine();
             for(VehiculoExterno v :contenedor.getVehiculos()){
-                int id = Integer.parseInt(v.getId()) + 1;
+                int id = Integer.parseInt(v.getId());
                 vcl= "IDE: "+v.getId()+"\nID: "+id+"\nHora salida:" + minutosHoras(v.getHoraSalida())+"\nHora llegada:" +minutosHoras(v.getHoraLlegada())+ "\nCapacidad:" +v.getCapacidad()+"\nPuntosFijos" +v.getPuntosFijos().toString()+"\n";
                 writer.write(vcl);
                 writer.newLine();
@@ -117,7 +117,7 @@ public class GeneradorEJBBean {
     private List<VehiculoExterno> generarListaVehiculos(int cantV, int cantP) {
         List<VehiculoExterno> vehiculoExternos = new ArrayList<>();
         VehiculoExterno v;
-        for (int i = 0; i < cantV; i++) {
+        for (int i = 1; i <= cantV; i++) {
             v = new VehiculoExterno();
             v.setId("" + i);
             v.setOrigen(generarUbicacion());
@@ -149,17 +149,20 @@ public class GeneradorEJBBean {
                         }
                     }
                     for(String r :a_remover){
-                        v1.getPuntosFijos().remove(r);
+                        if(v1.getPuntosFijos().size() > v.getPuntosFijos().size())
+                            v1.getPuntosFijos().remove(r);
+                        else
+                            v.getPuntosFijos().remove(r);
                     }
                 }
             }
         }
-        int[] array = new int[cantP];
+        int[] array = new int[cantP+2];
         for(VehiculoExterno v:vehiculoExternos){
             for(String pf : v.getPuntosFijos()){
                 array[Integer.parseInt(pf)]++;
             }
-            for(int i = 0; i < cantP; i++){
+            for(int i = 1; i <= cantP; i++){
                 if(array[i] > 1)
                     v.getPuntosFijos().remove(String.valueOf(i));
 
@@ -171,7 +174,7 @@ public class GeneradorEJBBean {
     private List<PuntoExterno> generarListaPuntos(int cantP, int cantV) {
         List<PuntoExterno> puntoExternos = new ArrayList<>();
         PuntoExterno p;
-        for (int i = 0; i < cantP; i++) {
+        for (int i = 1; i <= cantP; i++) {
             p = new PuntoExterno();
             p.setId("" + i);
             p.setLugar(generarUbicacion());
@@ -231,7 +234,7 @@ public class GeneradorEJBBean {
         List<String> puntos = new ArrayList<>();
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
         MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
-        int tope = R.randomValueFromClosedInterval(0, cantP / 10, rnd);
+        int tope = R.randomValueFromClosedInterval(0, cantP / 3, rnd);
         if (tope > 0 && tope < 20)
             for (int i = 0; i < tope; i++) {
                 int random = R.randomValueFromClosedInterval(0, cantP - 1, rnd);
@@ -242,9 +245,10 @@ public class GeneradorEJBBean {
                         break;
                     }
                 }
-                if (!noValido && (puntoExternos.get(random).getVehiculos().contains(v.getId()) || puntoExternos.get(random).getVehiculos().isEmpty()) && cumpleHoraLLegadaVehiculo(puntoExternos.get(i), v))
-                    puntos.add("" + random);
-                else {
+                if (!noValido && (puntoExternos.get(random).getVehiculos().contains(v.getId()) || puntoExternos.get(random).getVehiculos().isEmpty()) && cumpleHoraLLegadaVehiculo(puntoExternos.get(i), v)) {
+                    int x = random + 1;
+                    puntos.add("" + x);
+                }else {
                     System.out.println("Reintentando recorrido...");
                 }
             }
@@ -271,8 +275,9 @@ public class GeneradorEJBBean {
         if (tope > 0)
             for (int i = 0; i < tope; i++) {
                 int random = R.randomValueFromClosedInterval(0, cantV - 1, rnd);
-                if (!vehiculos.contains("" + random))
-                    vehiculos.add("" + random);
+                int x = random+1;
+                if (!vehiculos.contains("" + x))
+                    vehiculos.add("" + x);
             }
         return vehiculos;
     }
