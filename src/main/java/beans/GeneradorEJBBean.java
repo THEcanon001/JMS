@@ -169,6 +169,64 @@ public class GeneradorEJBBean {
             }
         }
 
+        for(VehiculoExterno v :vehiculoExternos){
+            DataPuntoVehiculo data = new DataPuntoVehiculo();
+            data.setVehiculoExterno(v);
+            data.setPuntoExternos(obtenerPuntos(v));
+            while (!cumpleVentanas(data).isEmpty() || !cumpleCapacidad(data) || !cumploLlegada(data)){
+                v.getPuntosFijos().remove(0);
+                data.setVehiculoExterno(v);
+                data.setPuntoExternos(obtenerPuntos(v));
+            }
+        }
+
+    }
+
+    private boolean cumploLlegada(DataPuntoVehiculo d) {
+        double tiempoViaje = calcularTiempo(d) + d.getVehiculoExterno().getHoraSalida();
+        return tiempoViaje <= d.getVehiculoExterno().getHoraLlegada();
+    }
+
+    private boolean cumpleCapacidad(DataPuntoVehiculo data) {
+        int cant = 0;
+        for(PuntoExterno p: data.getPuntoExternos()){
+            cant+= p.getDimension();
+        }
+        return cant <= data.getVehiculoExterno().getCapacidad();
+    }
+
+    private List<PuntoExterno> obtenerPuntos(VehiculoExterno v) {
+        List<PuntoExterno> puntos = new ArrayList<>();
+        for(PuntoExterno p :puntoExternos){
+            if (v.getPuntosFijos().contains(p.getId()))
+                puntos.add(p);
+        }
+        return puntos;
+    }
+
+    private List<PuntoExterno> cumpleVentanas(DataPuntoVehiculo dataPV) {
+        List<PuntoExterno> result = new ArrayList<>();
+        if (dataPV.getVehiculoExterno() == null || dataPV.getPuntoExternos().isEmpty()) return result;
+        int tiempo = dataPV.getVehiculoExterno().getHoraSalida(); // minutos desde las 0:00
+        tiempo += calcularTimeDistance(dataPV.getVehiculoExterno().getOrigen(), dataPV.getPuntoExternos().get(0).getLugar()).getTime();// Origen al P1
+        for (int i = 0; i < dataPV.getPuntoExternos().size() - 1; i++) {
+            if (tiempo < dataPV.getPuntoExternos().get(i).getHorarioMin()) {
+                tiempo = dataPV.getPuntoExternos().get(i).getHorarioMin(); // vehiculo espera
+            }
+            tiempo += dataPV.getPuntoExternos().get(i).getTiempoEspera();
+            if (tiempo > dataPV.getPuntoExternos().get(i).getHorarioMax()) { // Marchesi
+                result.add(dataPV.getPuntoExternos().get(i));
+            }
+            tiempo +=  calcularTimeDistance(dataPV.getPuntoExternos().get(i).getLugar(), dataPV.getPuntoExternos().get(i+1).getLugar()).getTime();; // De P1 a Pn
+        }
+        if (tiempo < dataPV.getPuntoExternos().get(dataPV.getPuntoExternos().size() - 1).getHorarioMin()) {
+            tiempo = dataPV.getPuntoExternos().get(dataPV.getPuntoExternos().size() - 1).getHorarioMin(); // vehiculo espera
+        }
+        tiempo += dataPV.getPuntoExternos().get(dataPV.getPuntoExternos().size() - 1).getTiempoEspera();
+        if (tiempo > dataPV.getPuntoExternos().get(dataPV.getPuntoExternos().size() - 1).getHorarioMax()) { // Marchesi
+            result.add(dataPV.getPuntoExternos().get(dataPV.getPuntoExternos().size() - 1));
+        }
+        return result;
     }
 
     private List<PuntoExterno> generarListaPuntos(int cantP, int cantV) {
@@ -240,12 +298,12 @@ public class GeneradorEJBBean {
                 int random = R.randomValueFromClosedInterval(0, cantP - 1, rnd);
                 boolean noValido = false;
                 for (VehiculoExterno ve : vehiculoExternos) {
-                    if (ve.getPuntosFijos() != null && !ve.getPuntosFijos().isEmpty() && ve.getPuntosFijos().contains("" + i)) {
+                    if (ve.getPuntosFijos() != null && !ve.getPuntosFijos().isEmpty() && ve.getPuntosFijos().contains("" + random)) {
                         noValido = true;
                         break;
                     }
                 }
-                if (!noValido && (puntoExternos.get(random).getVehiculos().contains(v.getId()) || puntoExternos.get(random).getVehiculos().isEmpty()) && cumpleHoraLLegadaVehiculo(puntoExternos.get(i), v)) {
+                if (!noValido && (puntoExternos.get(random).getVehiculos().contains(v.getId()) || puntoExternos.get(random).getVehiculos().isEmpty()) && cumpleHoraLLegadaVehiculo(puntoExternos.get(random), v)) {
                     int x = random + 1;
                     puntos.add("" + x);
                 }else {
@@ -335,6 +393,44 @@ public class GeneradorEJBBean {
         double hora_final = obtenerTimeDistance(v, punto).getTime();
         double hora_partida = v.getHoraSalida();
         return hora_final + hora_partida <= v.getHoraLlegada();
+    }
+
+    public double calcularTiempo(DataPuntoVehiculo d) {
+        double result;
+        if (d.getPuntoExternos().isEmpty() || d.getVehiculoExterno() == null) {
+            return 0;
+        }
+        double horaActual = d.getVehiculoExterno().getHoraSalida();
+        if (d.getPuntoExternos().size() == 1) {
+            result = calcularTimeDistance(d.getVehiculoExterno().getOrigen(), d.getPuntoExternos().get(0).getLugar()).getTime();
+            horaActual += result;
+            if (horaActual < d.getPuntoExternos().get(0).getHorarioMin()) {
+                result = d.getPuntoExternos().get(0).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
+//                horaActual = d.getPuntoExternos().get(0).getHorarioMin();
+            }
+            result += d.getPuntoExternos().get(0).getTiempoEspera();
+            result += calcularTimeDistance(d.getPuntoExternos().get(0).getLugar(), d.getVehiculoExterno().getDestino()).getTime();
+            return result;
+        }
+        result = calcularTimeDistance(d.getVehiculoExterno().getOrigen(), d.getPuntoExternos().get(0).getLugar()).getTime();// V al primer P
+        horaActual += result;
+        for (int i = 0; i < d.getPuntoExternos().size() - 1; i++) {
+            if (horaActual < d.getPuntoExternos().get(i).getHorarioMin()) {
+                result = d.getPuntoExternos().get(i).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
+                horaActual = d.getPuntoExternos().get(i).getHorarioMin();
+            }
+            result += d.getPuntoExternos().get(i).getTiempoEspera(); // tiempo en P
+            result += calcularTimeDistance(d.getPuntoExternos().get(i).getLugar(), d.getPuntoExternos().get(i+1).getLugar()).getTime(); // De P1 a Pn-1
+            horaActual += d.getPuntoExternos().get(i).getTiempoEspera();
+            horaActual += calcularTimeDistance(d.getPuntoExternos().get(i).getLugar(), d.getPuntoExternos().get(i+1).getLugar()).getTime();// De P1 a Pn-1
+        }
+        if (horaActual < d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getHorarioMin()) {
+            result = d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
+//            horaActual = d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getHorarioMin();
+        }
+        result += d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getTiempoEspera(); // tiempo en Pn
+        result += calcularTimeDistance(d.getVehiculoExterno().getDestino(), d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getLugar()).getTime(); // De Pn a destino de V// De Pn a destino de V
+        return result;
     }
 
     private TimeDistance calcularTimeDistance(Coord origen, Coord destino) {
