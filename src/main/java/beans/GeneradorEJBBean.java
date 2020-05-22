@@ -104,7 +104,7 @@ public class GeneradorEJBBean {
         Unirest.setTimeouts(0, 0);
         Gson gson = new Gson();
         try {
-            Unirest.post("http://localhost:8080/ruteo-ws-26/rest/ruteows/ruta")
+            Unirest.post("http://localhost:8080/ruteo-ws-1.0-SNAPSHOT/rest/ruteows/ruta")
                     .header("Content-Type", "application/json")
                     .body(gson.toJson(contenedor))
                     .asString();
@@ -179,6 +179,7 @@ public class GeneradorEJBBean {
                 data.setPuntoExternos(obtenerPuntos(v));
             }
         }
+
 
     }
 
@@ -405,7 +406,7 @@ public class GeneradorEJBBean {
             result = calcularTimeDistance(d.getVehiculoExterno().getOrigen(), d.getPuntoExternos().get(0).getLugar()).getTime();
             horaActual += result;
             if (horaActual < d.getPuntoExternos().get(0).getHorarioMin()) {
-                result = d.getPuntoExternos().get(0).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
+                result += d.getPuntoExternos().get(0).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
 //                horaActual = d.getPuntoExternos().get(0).getHorarioMin();
             }
             result += d.getPuntoExternos().get(0).getTiempoEspera();
@@ -416,7 +417,7 @@ public class GeneradorEJBBean {
         horaActual += result;
         for (int i = 0; i < d.getPuntoExternos().size() - 1; i++) {
             if (horaActual < d.getPuntoExternos().get(i).getHorarioMin()) {
-                result = d.getPuntoExternos().get(i).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
+                result += d.getPuntoExternos().get(i).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
                 horaActual = d.getPuntoExternos().get(i).getHorarioMin();
             }
             result += d.getPuntoExternos().get(i).getTiempoEspera(); // tiempo en P
@@ -425,7 +426,7 @@ public class GeneradorEJBBean {
             horaActual += calcularTimeDistance(d.getPuntoExternos().get(i).getLugar(), d.getPuntoExternos().get(i+1).getLugar()).getTime();// De P1 a Pn-1
         }
         if (horaActual < d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getHorarioMin()) {
-            result = d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
+            result += d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
 //            horaActual = d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getHorarioMin();
         }
         result += d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getTiempoEspera(); // tiempo en Pn
