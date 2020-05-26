@@ -1,6 +1,7 @@
 package beans;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -54,7 +55,6 @@ public class GeneradorEJBBean {
         List<VehiculoExterno> vehiculoExternos = generarListaVehiculos(v, p);
         imprimir(puntoExternos, vehiculoExternos);
         enviar(puntoExternos, vehiculoExternos);
-
     }
 
     private void imprimir(List<PuntoExterno> puntoExternos, List<VehiculoExterno> vehiculoExternos) {
@@ -467,5 +467,28 @@ public class GeneradorEJBBean {
             }
         }
         return t;
+    }
+
+    public void enviarParametros(Contenedor contenedor) {
+        String[] size = {"50", "100", "200"};
+        String[] crossover = {"05", "075", "10"};
+        String[] mutation = {"001", "005", "01"};
+        for (String s : size) {
+            for (String c : crossover) {
+                for (String m : mutation) {
+                    Unirest.setTimeouts(0, 0);
+                    Gson gson = new Gson();
+                    contenedor.setParam(s+c+m+".params");
+                    try {
+                        Unirest.post("http://localhost:8080/ruteo-ws-1.0-SNAPSHOT/rest/ruteows/ruta")
+                                .header("Content-Type", "application/json")
+                                .body(gson.toJson(contenedor))
+                                .asString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }

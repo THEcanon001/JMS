@@ -2,11 +2,13 @@ package service;
 
 import beans.GeneradorEJBBean;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import datatype.Contenedor;
 
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Singleton;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
@@ -27,5 +29,12 @@ public class ApiServiceProducer {
             e.printStackTrace();
             return "ERROR, "+e.getMessage();
         }
+    }
+
+    @POST
+    @Path("tutaParametrico")
+    public String tutaParametrico(Contenedor contenedor){
+        generadorEJBBean.enviarParametros(contenedor);
+        return "OK";
     }
 }
