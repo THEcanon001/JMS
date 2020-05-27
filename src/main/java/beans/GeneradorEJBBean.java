@@ -53,7 +53,7 @@ public class GeneradorEJBBean {
         puntoExternos = generarListaPuntos(p, v);
         List<VehiculoExterno> vehiculoExternos = generarListaVehiculos(v, p);
         imprimir(puntoExternos, vehiculoExternos);
-        enviar(puntoExternos, vehiculoExternos);
+//        enviar(puntoExternos, vehiculoExternos);
 
     }
 
@@ -104,7 +104,8 @@ public class GeneradorEJBBean {
         Unirest.setTimeouts(0, 0);
         Gson gson = new Gson();
         try {
-            Unirest.post("http://localhost:8080/ruteo-ws-1.0-SNAPSHOT/rest/ruteows/ruta")
+//            Unirest.post("http://localhost:8080/ruteo-ws-1.0-SNAPSHOT/rest/ruteows/ruta")
+            Unirest.post("http://localhost:8080/rest/ruteows/ruta")
                     .header("Content-Type", "application/json")
                     .body(gson.toJson(contenedor))
                     .asString();

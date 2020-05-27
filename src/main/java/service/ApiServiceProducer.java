@@ -2,13 +2,13 @@ package service;
 
 import beans.GeneradorEJBBean;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import datatype.Resultado;
 
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Singleton;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 @Singleton
 @LocalBean
@@ -27,5 +27,13 @@ public class ApiServiceProducer {
             e.printStackTrace();
             return "ERROR, "+e.getMessage();
         }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/recibirSolucion")
+    public String recibirSolucion(Resultado resultado) {
+        System.out.println("Se recibe la solucion: " + resultado);
+        return "Ok.";
     }
 }
