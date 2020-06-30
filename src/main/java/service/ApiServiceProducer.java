@@ -18,6 +18,12 @@ public class ApiServiceProducer {
     GeneradorEJBBean generadorEJBBean;
 
     @GET
+    @Path("echo")
+    public String echo(){
+        return "rompele las muelas";
+    }
+
+    @GET
     @Path("generador")
     public String tutaGenerator(@QueryParam("puntos") int p, @QueryParam("vehiculos") int v){
         try {

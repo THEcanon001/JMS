@@ -438,7 +438,7 @@ public class GeneradorEJBBean {
     private TimeDistance calcularTimeDistance(Coord origen, Coord destino) {
         HttpResponse<String> response;
         TimeDistance t = new TimeDistance();
-        final String URL = "http://des25:5000/route/v1/driving/";
+        final String URL = "http://des23:5000/route/v1/driving/";
         final String PARAMETERS = "?overview=false";
         int i = 0;
         while (i == 0) {
