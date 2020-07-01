@@ -77,18 +77,18 @@ public class GeneradorEJBBean {
             BufferedWriter writer = new BufferedWriter(fileWriter);
             writer.write("Puntos: ");
             writer.newLine();
-            for(PuntoExterno p :contenedor.getPuntos()){
+            for (PuntoExterno p : contenedor.getPuntos()) {
                 int id = Integer.parseInt(p.getId());
-                pto= "IDE: "+p.getId()+"\nID: "+id+"\nTiempo E:" + minutosHoras(p.getTiempoEspera())+ "\nHora Min:"+minutosHoras(p.getHorarioMin()) + "\nHora Max:" +minutosHoras(p.getHorarioMax()) +
-                        "\nPrio:"+p.getPrioridad() + "\nCapacidad:" + p.getDimension() + "\nVehiculos permitidos:" + p.getVehiculos().toString()+"\n";
+                pto = "IDE: " + p.getId() + "\nID: " + id + "\nTiempo E:" + minutosHoras(p.getTiempoEspera()) + "\nHora Min:" + minutosHoras(p.getHorarioMin()) + "\nHora Max:" + minutosHoras(p.getHorarioMax()) +
+                        "\nPrio:" + p.getPrioridad() + "\nCapacidad:" + p.getDimension() + "\nVehiculos permitidos:" + p.getVehiculos().toString() + "\n";
                 writer.write(pto);
                 writer.newLine();
             }
             writer.write("Vehiculos: ");
             writer.newLine();
-            for(VehiculoExterno v :contenedor.getVehiculos()){
+            for (VehiculoExterno v : contenedor.getVehiculos()) {
                 int id = Integer.parseInt(v.getId());
-                vcl= "IDE: "+v.getId()+"\nID: "+id+"\nHora salida:" + minutosHoras(v.getHoraSalida())+"\nHora llegada:" +minutosHoras(v.getHoraLlegada())+ "\nCapacidad:" +v.getCapacidad()+"\nPuntosFijos" +v.getPuntosFijos().toString()+"\n";
+                vcl = "IDE: " + v.getId() + "\nID: " + id + "\nHora salida:" + minutosHoras(v.getHoraSalida()) + "\nHora llegada:" + minutosHoras(v.getHoraLlegada()) + "\nCapacidad:" + v.getCapacidad() + "\nPuntosFijos" + v.getPuntosFijos().toString() + "\n";
                 writer.write(vcl);
                 writer.newLine();
             }
@@ -138,18 +138,18 @@ public class GeneradorEJBBean {
 
     private void comprobarPuntosFijos(List<VehiculoExterno> vehiculoExternos, int cantP) {
         List<String> a_remover = new ArrayList<>();
-        for(VehiculoExterno v:vehiculoExternos){
+        for (VehiculoExterno v : vehiculoExternos) {
             a_remover = new ArrayList<>();
-            for(VehiculoExterno v1: vehiculoExternos){
-                if(!v.getId().equals(v1.getId())){
-                    for(String pfv :v.getPuntosFijos()){
-                        for(String pfv1 :v1.getPuntosFijos()){
-                            if(pfv.equals(pfv1))
+            for (VehiculoExterno v1 : vehiculoExternos) {
+                if (!v.getId().equals(v1.getId())) {
+                    for (String pfv : v.getPuntosFijos()) {
+                        for (String pfv1 : v1.getPuntosFijos()) {
+                            if (pfv.equals(pfv1))
                                 a_remover.add(pfv1);
                         }
                     }
-                    for(String r :a_remover){
-                        if(v1.getPuntosFijos().size() > v.getPuntosFijos().size())
+                    for (String r : a_remover) {
+                        if (v1.getPuntosFijos().size() > v.getPuntosFijos().size())
                             v1.getPuntosFijos().remove(r);
                         else
                             v.getPuntosFijos().remove(r);
@@ -157,23 +157,23 @@ public class GeneradorEJBBean {
                 }
             }
         }
-        int[] array = new int[cantP+2];
-        for(VehiculoExterno v:vehiculoExternos){
-            for(String pf : v.getPuntosFijos()){
+        int[] array = new int[cantP + 2];
+        for (VehiculoExterno v : vehiculoExternos) {
+            for (String pf : v.getPuntosFijos()) {
                 array[Integer.parseInt(pf)]++;
             }
-            for(int i = 1; i <= cantP; i++){
-                if(array[i] > 1)
+            for (int i = 1; i <= cantP; i++) {
+                if (array[i] > 1)
                     v.getPuntosFijos().remove(String.valueOf(i));
 
             }
         }
 
-        for(VehiculoExterno v :vehiculoExternos){
+        for (VehiculoExterno v : vehiculoExternos) {
             DataPuntoVehiculo data = new DataPuntoVehiculo();
             data.setVehiculoExterno(v);
             data.setPuntoExternos(obtenerPuntos(v));
-            while (!cumpleVentanas(data).isEmpty() || !cumpleCapacidad(data) || !cumploLlegada(data)){
+            while (!cumpleVentanas(data).isEmpty() || !cumpleCapacidad(data) || !cumploLlegada(data)) {
                 v.getPuntosFijos().remove(0);
                 data.setVehiculoExterno(v);
                 data.setPuntoExternos(obtenerPuntos(v));
@@ -190,15 +190,15 @@ public class GeneradorEJBBean {
 
     private boolean cumpleCapacidad(DataPuntoVehiculo data) {
         int cant = 0;
-        for(PuntoExterno p: data.getPuntoExternos()){
-            cant+= p.getDimension();
+        for (PuntoExterno p : data.getPuntoExternos()) {
+            cant += p.getDimension();
         }
         return cant <= data.getVehiculoExterno().getCapacidad();
     }
 
     private List<PuntoExterno> obtenerPuntos(VehiculoExterno v) {
         List<PuntoExterno> puntos = new ArrayList<>();
-        for(PuntoExterno p :puntoExternos){
+        for (PuntoExterno p : puntoExternos) {
             if (v.getPuntosFijos().contains(p.getId()))
                 puntos.add(p);
         }
@@ -218,7 +218,8 @@ public class GeneradorEJBBean {
             if (tiempo > dataPV.getPuntoExternos().get(i).getHorarioMax()) { // Marchesi
                 result.add(dataPV.getPuntoExternos().get(i));
             }
-            tiempo +=  calcularTimeDistance(dataPV.getPuntoExternos().get(i).getLugar(), dataPV.getPuntoExternos().get(i+1).getLugar()).getTime();; // De P1 a Pn
+            tiempo += calcularTimeDistance(dataPV.getPuntoExternos().get(i).getLugar(), dataPV.getPuntoExternos().get(i + 1).getLugar()).getTime();
+            ; // De P1 a Pn
         }
         if (tiempo < dataPV.getPuntoExternos().get(dataPV.getPuntoExternos().size() - 1).getHorarioMin()) {
             tiempo = dataPV.getPuntoExternos().get(dataPV.getPuntoExternos().size() - 1).getHorarioMin(); // vehiculo espera
@@ -307,12 +308,13 @@ public class GeneradorEJBBean {
                 if (!noValido && (puntoExternos.get(random).getVehiculos().contains(v.getId()) || puntoExternos.get(random).getVehiculos().isEmpty()) && cumpleHoraLLegadaVehiculo(puntoExternos.get(random), v)) {
                     int x = random + 1;
                     puntos.add("" + x);
-                }else {
+                } else {
                     System.out.println("Reintentando recorrido...");
                 }
             }
         return puntos;
     }
+
     private String minutosHoras(double minutos) {
         int hora = (int) (minutos / 60);
         int min = (int) (minutos % 60);
@@ -326,6 +328,7 @@ public class GeneradorEJBBean {
         }
         return "" + horas + ":" + mins;
     }
+
     private List<String> generarVehiculos(int cantV) {
         List<String> vehiculos = new ArrayList<>();
         int valorDado = (int) Math.floor(Math.random() * 200 + 1);
@@ -334,7 +337,7 @@ public class GeneradorEJBBean {
         if (tope > 0)
             for (int i = 0; i < tope; i++) {
                 int random = R.randomValueFromClosedInterval(0, cantV - 1, rnd);
-                int x = random+1;
+                int x = random + 1;
                 if (!vehiculos.contains("" + x))
                     vehiculos.add("" + x);
             }
@@ -421,9 +424,9 @@ public class GeneradorEJBBean {
                 horaActual = d.getPuntoExternos().get(i).getHorarioMin();
             }
             result += d.getPuntoExternos().get(i).getTiempoEspera(); // tiempo en P
-            result += calcularTimeDistance(d.getPuntoExternos().get(i).getLugar(), d.getPuntoExternos().get(i+1).getLugar()).getTime(); // De P1 a Pn-1
+            result += calcularTimeDistance(d.getPuntoExternos().get(i).getLugar(), d.getPuntoExternos().get(i + 1).getLugar()).getTime(); // De P1 a Pn-1
             horaActual += d.getPuntoExternos().get(i).getTiempoEspera();
-            horaActual += calcularTimeDistance(d.getPuntoExternos().get(i).getLugar(), d.getPuntoExternos().get(i+1).getLugar()).getTime();// De P1 a Pn-1
+            horaActual += calcularTimeDistance(d.getPuntoExternos().get(i).getLugar(), d.getPuntoExternos().get(i + 1).getLugar()).getTime();// De P1 a Pn-1
         }
         if (horaActual < d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getHorarioMin()) {
             result += d.getPuntoExternos().get(d.getPuntoExternos().size() - 1).getHorarioMin() - horaActual; // si el VehiculoExterno llega antes de que abra, espera.
@@ -437,7 +440,7 @@ public class GeneradorEJBBean {
     private TimeDistance calcularTimeDistance(Coord origen, Coord destino) {
         HttpResponse<String> response;
         TimeDistance t = new TimeDistance();
-        final String URL = "http://des25:5000/route/v1/driving/";
+        final String URL = "http://des23:5000/route/v1/driving/";
         final String PARAMETERS = "?overview=false";
         int i = 0;
         while (i == 0) {
@@ -470,24 +473,32 @@ public class GeneradorEJBBean {
     }
 
     public void enviarParametros(Contenedor contenedor) {
-        String[] size = {"50", "100", "200"};
-        String[] crossover = {"05", "075", "10"};
-        String[] mutation = {"001", "005", "01"};
-        for (String s : size) {
-            for (String c : crossover) {
-                for (String m : mutation) {
-                    Unirest.setTimeouts(0, 0);
-                    Gson gson = new Gson();
-                    contenedor.setParam(s+c+m+".params");
-                    try {
-                        String test = "http://osrm-desa:8080/rest/ruteows/test";
-                        String prod = "http://osrm-prod:8080/rest/ruteows/test";
-                        Unirest.post(prod)
-                                .header("Content-Type", "application/json")
-                                .body(gson.toJson(contenedor))
-                                .asString();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+        int[] tamPoblacionArray = {50, 100, 200};
+        float[] probCruzArray = {(float) 0.5, (float) 0.75, 1};
+        float[] probMutArray = {(float) 0.01, (float) 0.05, (float) 0.1};
+        int[] seleccion1Array = {1, 2, 3};
+        int[] seleccion2Array = {1, 2, 3};
+        for (int tamp : tamPoblacionArray) {
+            for (float probC : probCruzArray) {
+                for (float probM : probMutArray) {
+                    for (int s1 : seleccion1Array) {
+                        for (int s2 : seleccion2Array) {
+                            Unirest.setTimeouts(0, 0);
+                            String nombre = tamp + "-" + probC + "-" + probM + "-" + s1 + "-" + s2+".params";
+                            Gson gson = new Gson();
+                            contenedor.setParam(nombre);
+                            try {
+                                String test = "http://osrm-desa:8080/rest/ruteows/test";
+                                String prod = "http://osrm-prod:8080/rest/ruteows/test";
+                                String local = "http://des25:8080/rest/ruteows/test";
+                                Unirest.post(test)
+                                        .header("Content-Type", "application/json")
+                                        .body(gson.toJson(contenedor))
+                                        .asString();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
             }
