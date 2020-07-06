@@ -1,5 +1,6 @@
 package service;
 
+import beans.AsynchronousEJBBean;
 import beans.GeneradorEJBBean;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import datatype.Contenedor;
@@ -19,6 +20,9 @@ public class ApiServiceProducer {
     @EJB
     GeneradorEJBBean generadorEJBBean;
 
+    @EJB
+    AsynchronousEJBBean asynchronousEJBBean;
+
     @GET
     @Path("generador")
     public String tutaGenerator(@QueryParam("puntos") int p, @QueryParam("vehiculos") int v){
@@ -29,6 +33,18 @@ public class ApiServiceProducer {
             e.printStackTrace();
             return "ERROR, "+e.getMessage();
         }
+    }
+    @GET
+    @Path("pruebaSemaforo")
+    public String pruebaSemaforo(@QueryParam("veces") Integer veces){
+        for (int i = 0; i <veces ; i++){
+            try {
+                asynchronousEJBBean.pruebaSemaforo();
+            } catch (UnirestException e) {
+                e.printStackTrace();
+            }
+        }
+        return "OK";
     }
 
     @POST
