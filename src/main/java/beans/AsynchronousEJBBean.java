@@ -19,4 +19,14 @@ public class AsynchronousEJBBean {
         String var = response.getBody();
         System.out.println(var);
     }
+
+    @Asynchronous
+    public void test_serial() throws UnirestException {
+        String url = "http://des23:8200/evolution-web/test_serial";
+        HttpResponse<String> response = Unirest.get(url)
+                .header("cache-control", "no-cache")
+                .asString();
+        String var = response.getBody();
+        System.out.println(var);
+    }
 }

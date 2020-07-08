@@ -53,4 +53,17 @@ public class ApiServiceProducer {
         generadorEJBBean.enviarParametros(contenedor);
         return "OK";
     }
+
+    @GET
+    @Path("test_serial")
+    public String test_serial(@QueryParam("veces") Integer veces){
+        for (int i = 0; i <veces ; i++){
+            try {
+                asynchronousEJBBean.test_serial();
+            } catch (UnirestException e) {
+                e.printStackTrace();
+            }
+        }
+        return "OK";
+    }
 }
