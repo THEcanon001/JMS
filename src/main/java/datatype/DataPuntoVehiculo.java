@@ -15,7 +15,7 @@ public class DataPuntoVehiculo implements Serializable {
     private List<PuntoExterno> PuntoExternos;
 
     private long secuencia = 0L;
-    private static final String URL = "http://des23:5000/route/v1/driving/";
+    private static final String URL = "http://osrm-desa:5000/route/v1/driving/";
     private final static String PARAMETERS = "?overview=false";
 
     public DataPuntoVehiculo() {

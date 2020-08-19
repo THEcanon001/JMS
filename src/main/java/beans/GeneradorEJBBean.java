@@ -440,7 +440,7 @@ public class GeneradorEJBBean {
     private TimeDistance calcularTimeDistance(Coord origen, Coord destino) {
         HttpResponse<String> response;
         TimeDistance t = new TimeDistance();
-        final String URL = "http://des23:5000/route/v1/driving/";
+        final String URL = "http://osrm-desa:5000/route/v1/driving/";
         final String PARAMETERS = "?overview=false";
         int i = 0;
         while (i == 0) {
@@ -484,7 +484,7 @@ public class GeneradorEJBBean {
                     for (int s1 : seleccion1Array) {
                         for (int s2 : seleccion2Array) {
                             Unirest.setTimeouts(0, 0);
-                            String nombre = tamp + "-" + probC + "-" + probM + "-" + s1 + "-" + s2+".params";
+                            String nombre = tamp + "-" + probC + "-" + probM + "-" + s1 + "-" + s2 + ".params";
                             Gson gson = new Gson();
                             contenedor.setParam(nombre);
                             try {
