@@ -9,18 +9,20 @@ public class VehiculoExterno implements Serializable {
     private int horaSalida;
     private Coord destino;
     private int horaLlegada;
+    private String horaLlegadaEstimada;
     private double capacidad;
     private List<String> puntosFijos;
 
     public VehiculoExterno() {
     }
 
-    public VehiculoExterno(String id, Coord origen, int horaSalida, Coord destino, int horaLlegada, double capacidad, List<String> puntosFijos) {
+    public VehiculoExterno(String id, Coord origen, int horaSalida, Coord destino, int horaLlegada, String horaLlegadaEstimada, double capacidad, List<String> puntosFijos) {
         this.id = id;
         this.origen = origen;
         this.horaSalida = horaSalida;
         this.destino = destino;
         this.horaLlegada = horaLlegada;
+        this.horaLlegadaEstimada = horaLlegadaEstimada;
         this.capacidad = capacidad;
         this.puntosFijos = puntosFijos;
     }
@@ -79,5 +81,13 @@ public class VehiculoExterno implements Serializable {
 
     public void setPuntosFijos(List<String> puntosFijos) {
         this.puntosFijos = puntosFijos;
+    }
+
+    public String getHoraLlegadaEstimada() {
+        return horaLlegadaEstimada;
+    }
+
+    public void setHoraLlegadaEstimada(String horaLlegadaEstimada) {
+        this.horaLlegadaEstimada = horaLlegadaEstimada;
     }
 }

@@ -24,7 +24,7 @@ import java.util.List;
 @Stateless
 @LocalBean
 public class GeneradorEJBBean {
-    private final static String OUT_PATH = "C:/Users/christiang/Desktop/tutanka.txt";
+    private final static String OUT_PATH = "C:/Users/ignaciod/Desktop/tutanka.txt";
     private long secuencia = 0L;
     private static final String latitud_str = "-34.";
     private static final String longuitud_str = "-56.";
@@ -360,7 +360,48 @@ public class GeneradorEJBBean {
         }
         lo += "" + longitud;
         la += "" + lat;
+        return new Coord(Double.parseDouble(la), Double.parseDouble(lo));
+    }
+
+    private Coord generarUbicacionInterior() {
+        // SO: -34.073256, -57.577416
+        // NO: -30.524390, -57.764330
+        // NE: -31.373495, -55.014623
+        // SE: -34.073256, -55.014623
+        // TODO: 23/2/2021
+        int valorDado = (int) Math.floor(Math.random() * 200 + 1);
+        MersenneTwisterFast rnd = new MersenneTwisterFast(valorDado);
+        int lat = R.randomValueFromClosedInterval(min, max, rnd);
+        rnd = new MersenneTwisterFast((int) Math.floor(Math.random() * 200 + 1));
+        int longitud = R.randomValueFromClosedInterval(min_2, max_2, rnd);
+        String lo = longuitud_str, la = latitud_str;
+        if (longitud <= 99999) {
+            lo += "0";
+        }
+        lo += "" + longitud;
+        la += "" + lat;
         return new Coord(Double.parseDouble(lo), Double.parseDouble(la));
+    }
+
+    private Contenedor generadorManual () {
+        List<PuntoExterno> puntos = new ArrayList<>();
+        List<VehiculoExterno> vehiculos = new ArrayList<>();
+
+        for (int i = 0; i < 60; i++) {
+            PuntoExterno pe = new PuntoExterno();
+            pe.setId("" + i);
+            pe.setHorarioMin(400);
+            pe.setHorarioMax(1400);
+            pe.setDimension(1);
+            pe.setPrioridad(1);
+            pe.setTiempoEspera(15);
+            puntos.add(pe);
+        }
+
+        puntos.get(0);
+
+        Contenedor contenedor = new Contenedor(puntos, vehiculos);
+        return null;
     }
 
     private TimeDistance obtenerTimeDistance(VehiculoExterno v, PuntoExterno punto) {
@@ -438,7 +479,8 @@ public class GeneradorEJBBean {
     private TimeDistance calcularTimeDistance(Coord origen, Coord destino) {
         HttpResponse<String> response;
         TimeDistance t = new TimeDistance();
-        final String URL = "http://des25:5000/route/v1/driving/";
+//        final String URL = "http://des25:5000/route/v1/driving/";
+        final String URL = "http://osrm-desa:5000/route/v1/driving/";
         final String PARAMETERS = "?overview=false";
         int i = 0;
         while (i == 0) {

@@ -9,14 +9,15 @@ public class PuntoExterno implements Serializable {
     private double tiempoEspera;
     private List<String> vehiculos;
     private double dimension;
-    private int horarioMin; //en segundos
-    private int horarioMax; //en segundos
+    private int horarioMin; //en minutos desde las 00
+    private int horarioMax; //en minutos desde las 00
     private int prioridad;
+    private String horaEstimada;
 
     public PuntoExterno() {
     }
 
-    public PuntoExterno(String id, Coord lugar, double tiempoEspera, List<String> vehiculos, double dimension, int horarioMin, int horarioMax, int prioridad) {
+    public PuntoExterno(String id, Coord lugar, double tiempoEspera, List<String> vehiculos, double dimension, int horarioMin, int horarioMax, int prioridad, String horaEstimada) {
         this.id = id;
         this.lugar = lugar;
         this.tiempoEspera = tiempoEspera;
@@ -25,6 +26,22 @@ public class PuntoExterno implements Serializable {
         this.horarioMin = horarioMin;
         this.horarioMax = horarioMax;
         this.prioridad = prioridad;
+        this.horaEstimada = horaEstimada;
+    }
+
+    @Override
+    public String toString() {
+        return "PuntoExterno{" +
+                "id='" + id + '\'' +
+                ", lugar=" + lugar +
+                ", tiempoEspera=" + tiempoEspera +
+                ", vehiculos=" + vehiculos +
+                ", dimension=" + dimension +
+                ", horarioMin=" + horarioMin +
+                ", horarioMax=" + horarioMax +
+                ", prioridad=" + prioridad +
+                ", horaEstimada=" + horaEstimada +
+                '}';
     }
 
     public Coord getLugar() {
@@ -91,5 +108,11 @@ public class PuntoExterno implements Serializable {
         this.prioridad = prioridad;
     }
 
+    public String getHoraEstimada() {
+        return horaEstimada;
+    }
 
+    public void setHoraEstimada(String horaEstimada) {
+        this.horaEstimada = horaEstimada;
+    }
 }
